@@ -1,0 +1,20 @@
+[package]
+name = "server"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+serde = { version = "1.0.133", features = ["derive"]}
+uuid = {version = "0.8.2", features = ["serde", "v5"]}
+
+bevy = "0.6"
+bevy_spicy_networking = {git = "https://github.com/rezural/bevy_spicy_networking.git", branch = "bevy-main"}
+net = {path = "../net"}
+
+[profile.dev]
+opt-level = 1
+
+[profile.dev.package."*"]
+opt-level = 3

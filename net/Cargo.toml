@@ -1,0 +1,13 @@
+[package]
+name = "net"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+serde = { version = "*", features = ["derive"]}
+uuid = {version = "*", features = ["serde", "v5"]}
+typetag = "0.1.8"
+bevy_spicy_networking = {git = "https://github.com/rezural/bevy_spicy_networking.git", branch = "bevy-main"}
+bevy = "0.6"
