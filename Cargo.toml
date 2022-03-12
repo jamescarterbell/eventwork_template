@@ -6,10 +6,9 @@ edition = "2021"
 [dependencies]
 serde = { version = "1.0.133", features = ["derive"]}
 uuid = {version = "0.8.2", features = ["serde", "v5"]}
-typetag = "0.1.8"
 
 bevy = "0.6"
-bevy_spicy_networking = {git = "https://github.com/rezural/bevy_spicy_networking.git", branch = "bevy-main"}
+bevy_eventwork = "0.6.2"
 
 net = {path = "./net"}
 

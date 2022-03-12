@@ -1,8 +1,8 @@
 
-use std::net::SocketAddr;
+use std::{net::SocketAddr, ops::Deref};
 
 use bevy::prelude::*;
-use bevy_spicy_networking::{NetworkClient, NetworkSettings, ClientNetworkEvent, NetworkData};
+use bevy_eventwork::{NetworkClient, ClientNetworkEvent, NetworkData, NetworkClientProvider, Runtime};
 use net::shared::NewPlayerJoined;
 use uuid::Uuid;
 
@@ -10,11 +10,11 @@ use crate::ClientInfo;
 
 use super::{ClientState, ConnectingState, common::PlayerMap, ReadyState};
 
-pub fn add_state(app: &mut App){
+pub fn add_state<NCP: NetworkClientProvider, RT: Runtime>(app: &mut App){
     app
         .add_system_set(
             SystemSet::on_enter(ClientState::Connecting(ConnectingState::NotConnected))
-                .with_system(initialize_connecting)
+                .with_system(initialize_connecting::<NCP, RT>)
                 .with_system(initialize_ui)
         )
         .add_system_set(
@@ -23,7 +23,7 @@ pub fn add_state(app: &mut App){
         )
         .add_system_set(
             SystemSet::on_enter(ClientState::Connecting(ConnectingState::Validating))
-                .with_system(initialize_validating)
+                .with_system(initialize_validating::<NCP>)
         )
         .add_system_set(
             SystemSet::on_update(ClientState::Connecting(ConnectingState::Validating))
@@ -38,14 +38,14 @@ pub fn add_state(app: &mut App){
 #[derive(Component)]
 struct ConnectingText;
 
-fn initialize_connecting(
-    mut net: ResMut<NetworkClient>,
-    socket_addr: Res<SocketAddr>,
-    network_settings: Res<NetworkSettings>,
+fn initialize_connecting<NCP: NetworkClientProvider, RT: Runtime>(
+    mut net: ResMut<NetworkClient<NCP>>,
+    rt: Res<RT>,
+    network_settings: Res<NCP::NetworkSettings>,
 ){
     net.connect(
-        *socket_addr,
-        network_settings.clone()
+        rt.deref(),
+        network_settings.deref()
     );
 }
 
@@ -95,11 +95,11 @@ fn handle_not_connected_ui(
     }
 }
 
-fn initialize_validating(
+fn initialize_validating<NCP: NetworkClientProvider>(
     mut commands: Commands,
     mut connecting_text: Query<&mut Text, With<ConnectingText>>,
     font: Res<Handle<Font>>,
-    net: Res<NetworkClient>,
+    net: Res<NetworkClient<NCP>>,
     player_id: Res<ClientInfo>,
 ){
     let mut text = connecting_text.single_mut();

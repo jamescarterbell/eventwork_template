@@ -1,4 +1,4 @@
-use std::{time::Duration, net::{SocketAddr, IpAddr, Ipv4Addr}};
+use std::{time::Duration, net::{SocketAddr, IpAddr, Ipv4Addr}, str::FromStr};
 use bevy::{prelude::*, app::ScheduleRunnerSettings, log::{Level, LogSettings}};
 use net::to_client::client_register_network_messages;
 use states::add_client_states;
@@ -18,10 +18,11 @@ fn main(){
             filter: "wgpu=error".to_string(),
         });
     app.add_plugins(DefaultPlugins);
+    app.init_resource::<bevy::tasks::TaskPool>();
 
     // Before we can register the potential message types, we
     // need to add the plugin
-    app.add_plugin(bevy_spicy_networking::ClientPlugin);
+    app.add_plugin(bevy_eventwork::ClientPlugin::<bevy_eventwork::tcp::TcpClientProvider>::default());
     app.add_startup_system(general_setup);
 
     // Temps
@@ -30,9 +31,13 @@ fn main(){
         id: Uuid::new_v5(&Uuid::NAMESPACE_OID, name.as_bytes()),
         name,
     });
+    app.insert_resource(bevy_eventwork::tcp::NetworkSettings{
+        max_packet_length: 1024 * 1024,
+        addr: SocketAddr::from_str("127.0.0.1:7777").unwrap()
+    });
 
-    client_register_network_messages(&mut app);
-    add_client_states(&mut app);
+    client_register_network_messages::<bevy_eventwork::tcp::TcpClientProvider>(&mut app);
+    add_client_states::<bevy_eventwork::tcp::TcpClientProvider, bevy::tasks::TaskPool>(&mut app);
 
     app.run();
 }

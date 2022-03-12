@@ -1,28 +1,24 @@
 use serde::{Serialize, Deserialize};
 use uuid::Uuid;
-use bevy_spicy_networking::{ClientMessage, NetworkMessage, ServerMessage, AppNetworkClientMessage, AppNetworkServerMessage};
+use bevy_eventwork::{ClientMessage, ServerMessage, AppNetworkClientMessage, AppNetworkServerMessage, NetworkClientProvider, NetworkServerProvider};
 use bevy::prelude::*;
 
-pub fn shared_client_register_network_messages(app: &mut App){
+pub fn shared_client_register_network_messages<NCP: NetworkClientProvider>(app: &mut App){
     app
-        .listen_for_client_message::<NewPlayerJoined>()
-        .listen_for_client_message::<ReadyUpResponse>();
+        .listen_for_client_message::<NewPlayerJoined, NCP>()
+        .listen_for_client_message::<ReadyUpResponse, NCP>();
 }
 
-pub fn shared_server_register_network_messages(app: &mut App){
+pub fn shared_server_register_network_messages<NSP: NetworkServerProvider>(app: &mut App){
     app
-        .listen_for_server_message::<NewPlayerJoined>()
-        .listen_for_server_message::<ReadyUpResponse>();
+        .listen_for_server_message::<NewPlayerJoined, NSP>()
+        .listen_for_server_message::<ReadyUpResponse, NSP>();
 }
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct NewPlayerJoined{
     pub id: Uuid,
 }
-
-#[typetag::serde]
-impl NetworkMessage for NewPlayerJoined{}
-
 
 impl ServerMessage for NewPlayerJoined{
     const NAME: &'static str = "request:NewPlayer";
@@ -38,9 +34,6 @@ pub struct ReadyUpResponse{
     pub id: Uuid,
     pub ready: bool,
 }
-
-#[typetag::serde]
-impl NetworkMessage for ReadyUpResponse{}
 
 impl ClientMessage for ReadyUpResponse{
     const NAME: &'static str = "ReadyUpResponse";

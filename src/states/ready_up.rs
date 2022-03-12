@@ -1,7 +1,7 @@
 use std::ops::{Deref, DerefMut};
 
 use bevy::{prelude::*, utils::HashMap, ecs::entity::Entities};
-use bevy_spicy_networking::{NetworkData, NetworkClient};
+use bevy_eventwork::{NetworkData, NetworkClient, NetworkClientProvider};
 use net::{shared::{ReadyUpResponse, NewPlayerJoined}, to_server, to_client::AllReady};
 use uuid::Uuid;
 
@@ -9,12 +9,12 @@ use crate::ClientInfo;
 
 use super::{ClientState, ReadyState, common::PlayerMap};
 
-pub fn add_state(app: &mut App){
+pub fn add_state<NCP: NetworkClientProvider>(app: &mut App){
     app
         .add_system_set(
             SystemSet::on_enter(ClientState::ReadyUp(ReadyState::NotReady))
                 .with_system(initialize_ui)
-                .with_system(enter_not_ready)
+                .with_system(enter_not_ready::<NCP>)
         )
         .add_system_set(
             SystemSet::on_update(ClientState::ReadyUp(ReadyState::NotReady))
@@ -30,7 +30,7 @@ pub fn add_state(app: &mut App){
         .add_system_set(
             SystemSet::on_enter(ClientState::ReadyUp(ReadyState::Ready))
                 .with_system(initialize_ui)
-                .with_system(enter_ready)
+                .with_system(enter_ready::<NCP>)
         )
         .add_system_set(
             SystemSet::on_update(ClientState::ReadyUp(ReadyState::Ready))
@@ -278,14 +278,14 @@ fn handle_ready_button(
     }
 }
 
-fn enter_ready(
+fn enter_ready<NCP: NetworkClientProvider>(
     mut interaction_query: Query<
         (&Interaction, &mut UiColor, &Children, &mut ReadyButton),
         Changed<Interaction>,
     >,
     mut text_query: Query<&mut Text>,
     info: Res<ClientInfo>,
-    net: Res<NetworkClient>
+    net: Res<NetworkClient<NCP>>
 ){
     for (interaction, mut color, children, mut button_state) in interaction_query.iter_mut() {
         let mut text = text_query.get_mut(children[0]).unwrap();
@@ -297,14 +297,14 @@ fn enter_ready(
     }).unwrap();
 }
 
-fn enter_not_ready(
+fn enter_not_ready<NCP: NetworkClientProvider>(
     mut interaction_query: Query<
         (&mut UiColor, &Children),
         Changed<Interaction>,
     >,
     mut text_query: Query<&mut Text>,
     info: Res<ClientInfo>,
-    net: Res<NetworkClient>
+    net: Res<NetworkClient<NCP>>
 ){
     for (mut color, children) in interaction_query.iter_mut() {
         let mut text = text_query.get_mut(children[0]).unwrap();

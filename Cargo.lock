@@ -149,10 +149,57 @@ dependencies = [
 ]
 
 [[package]]
+name = "async-io"
+version = "1.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a811e6a479f2439f0c04038796b5cfb3d2ad56c230e0f2d3f7b04d68cfee607b"
+dependencies = [
+ "concurrent-queue",
+ "futures-lite",
+ "libc",
+ "log",
+ "once_cell",
+ "parking",
+ "polling",
+ "slab",
+ "socket2",
+ "waker-fn",
+ "winapi",
+]
+
+[[package]]
+name = "async-net"
+version = "1.6.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5373304df79b9b4395068fb080369ec7178608827306ce4d081cba51cac551df"
+dependencies = [
+ "async-io",
+ "blocking",
+ "futures-lite",
+]
+
+[[package]]
 name = "async-task"
 version = "4.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "677d306121baf53310a3fd342d88dc0824f6bbeace68347593658525565abee8"
+
+[[package]]
+name = "async-trait"
+version = "0.1.52"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "061a7acccaa286c011ddc30970520b98fa40e00c9d644633fb26b5fc63a265e3"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
+]
+
+[[package]]
+name = "atomic-waker"
+version = "1.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "065374052e7df7ee4047b1160cca5e1467a12351a40b3da123c870ba0b8eda2a"
 
 [[package]]
 name = "autocfg"
@@ -174,9 +221,9 @@ checksum = "904dfeac50f3cdaba28fc6f57fdcddb75f49ed61346676a78c4ffe55877802fd"
 
 [[package]]
 name = "bevy"
-version = "0.6.0"
+version = "0.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b77ad2987710ed960746c43813ad8c103db5c4c090f5cbc9c32c0a90a91bc599"
+checksum = "97342ea2f3bad36be2ded1d1fbd569ff83147b70697f12f1579e87a7480afa36"
 dependencies = [
  "bevy_internal",
 ]
@@ -344,6 +391,24 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn",
+]
+
+[[package]]
+name = "bevy_eventwork"
+version = "0.6.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1056b1be63ae536e4e2b99b08d8a76fbc3766e380d30cda4888560a90d65de94"
+dependencies = [
+ "async-channel",
+ "async-net",
+ "async-trait",
+ "bevy",
+ "bincode",
+ "dashmap",
+ "derive_more",
+ "futures-lite",
+ "serde",
+ "thiserror",
 ]
 
 [[package]]
@@ -577,28 +642,10 @@ name = "bevy_spicy_lobby_tempalte"
 version = "0.1.0"
 dependencies = [
  "bevy",
- "bevy_spicy_networking",
+ "bevy_eventwork",
  "net",
  "serde",
- "typetag",
  "uuid",
-]
-
-[[package]]
-name = "bevy_spicy_networking"
-version = "0.5.1"
-source = "git+https://github.com/rezural/bevy_spicy_networking.git?branch=bevy-main#cc92383cb8fcdc809f9ca2dd869f6dd1f44ef6fe"
-dependencies = [
- "bevy",
- "bincode",
- "crossbeam-channel",
- "dashmap",
- "derive_more",
- "downcast-rs",
- "serde",
- "thiserror",
- "tokio",
- "typetag",
 ]
 
 [[package]]
@@ -807,6 +854,20 @@ name = "block"
 version = "0.1.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0d8c1fef690941d3e7788d328517591fecc684c084084702d6ff1641e993699a"
+
+[[package]]
+name = "blocking"
+version = "1.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c6ccb65d468978a086b69884437ded69a90faab3bbe6e67f242173ea728acccc"
+dependencies = [
+ "async-channel",
+ "async-task",
+ "atomic-waker",
+ "fastrand",
+ "futures-lite",
+ "once_cell",
+]
 
 [[package]]
 name = "bumpalo"
@@ -2104,7 +2165,7 @@ name = "net"
 version = "0.1.0"
 dependencies = [
  "bevy",
- "bevy_spicy_networking",
+ "bevy_eventwork",
  "serde",
  "typetag",
  "uuid",
@@ -2384,6 +2445,19 @@ dependencies = [
  "crc32fast",
  "deflate",
  "miniz_oxide",
+]
+
+[[package]]
+name = "polling"
+version = "2.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "685404d509889fade3e86fe3a5803bca2ec09b0c0778d5ada6ec8bf7a8de5259"
+dependencies = [
+ "cfg-if 1.0.0",
+ "libc",
+ "log",
+ "wepoll-ffi",
+ "winapi",
 ]
 
 [[package]]
@@ -2677,7 +2751,7 @@ name = "server"
 version = "0.1.0"
 dependencies = [
  "bevy",
- "bevy_spicy_networking",
+ "bevy_eventwork",
  "net",
  "serde",
  "uuid",
@@ -2735,6 +2809,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f2dd574626839106c320a323308629dcb1acfc96e32a8cba364ddc61ac23ee83"
 dependencies = [
  "serde",
+]
+
+[[package]]
+name = "socket2"
+version = "0.4.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "66d72b759436ae32898a2af0a14218dbf55efde3feeb170eb623637db85ee1e0"
+dependencies = [
+ "libc",
+ "winapi",
 ]
 
 [[package]]
@@ -2889,21 +2973,6 @@ name = "tinyvec_macros"
 version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cda74da7e1a664f795bb1f8a87ec406fb89a02522cf6e50620d016add6dbbf5c"
-
-[[package]]
-name = "tokio"
-version = "1.16.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0c27a64b625de6d309e8c57716ba93021dccf1b3b5c97edd6d3dd2d2135afc0a"
-dependencies = [
- "bytes",
- "libc",
- "memchr",
- "mio 0.7.14",
- "num_cpus",
- "pin-project-lite",
- "winapi",
-]
 
 [[package]]
 name = "toml"
@@ -3149,6 +3218,15 @@ checksum = "c060b319f29dd25724f09a2ba1418f142f539b2be99fbf4d2d5a8f7330afb8eb"
 dependencies = [
  "js-sys",
  "wasm-bindgen",
+]
+
+[[package]]
+name = "wepoll-ffi"
+version = "0.1.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d743fdedc5c64377b5fc2bc036b01c7fd642205a0d96356034ae3404d49eb7fb"
+dependencies = [
+ "cc",
 ]
 
 [[package]]

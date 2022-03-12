@@ -1,7 +1,7 @@
 use std::ops::{Deref, DerefMut};
 
 use bevy::{utils::HashSet, prelude::{App, EventReader, CoreStage, ResMut}};
-use bevy_spicy_networking::NetworkData;
+use bevy_eventwork::NetworkData;
 use net::{ConnectionMap, shared::NewPlayerJoined};
 use uuid::Uuid;
 

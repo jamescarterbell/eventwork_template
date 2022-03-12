@@ -1,5 +1,5 @@
 use bevy::{utils::{HashMap, HashSet}, prelude::ResMut};
-use bevy_spicy_networking::ConnectionId;
+use bevy_eventwork::ConnectionId;
 use uuid::Uuid;
 
 pub mod shared;

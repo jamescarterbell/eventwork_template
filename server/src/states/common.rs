@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use bevy_spicy_networking::ServerNetworkEvent;
+use bevy_eventwork::ServerNetworkEvent;
 use net::ConnectionMap;
 
 
